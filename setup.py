@@ -33,7 +33,7 @@ setup(
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/RomanMelnyk113/trustpay',
+    url='https://github.com/RomanMelnyk113/emerchantpay',
 
     # Author details
     author='Roman Melnyk',
@@ -53,8 +53,8 @@ setup(
         'Programming Language :: Python :: 3.8',
     ],
 
-    keywords='trustpay payment python',
-    packages=['trustpay'],
+    keywords='emerchantpay payment python',
+    packages=['emerchantpay'],
 
     install_requires=['requests'],
 )
