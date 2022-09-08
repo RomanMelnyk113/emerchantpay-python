@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "emerchantpay"
+version = "0.0.1"
+description = "Emerchantpay python unofficial package"
+authors = ["Roman Melnyk <roman.melnyk20071992@gmail.com>"]
+
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+requests = "^2"
+dicttoxml = "^1.3.1"
+python-dotenv = {extras = ["cli"], version = "^0.21.0"}
+pytest = "*"
+pytest-env = "*"
