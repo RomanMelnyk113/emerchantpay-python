@@ -25,7 +25,7 @@ class PaymentRequest:
     currency: str
     customer_email: str
     billing_address:BillingAddress
-    transaction_types: str = "PLACEHOLDER"
+    transaction_types: List[str]
 
     consumer_id: str = ""
 

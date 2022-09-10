@@ -1,12 +1,8 @@
-import base64
-import hashlib
-import hmac
 import json
-import uuid
+import xmltodict
 from datetime import date, datetime
 from http import HTTPStatus
-from typing import Optional, Callable, List
-from urllib.parse import urlencode
+from typing import List
 from dataclasses import asdict
 from dicttoxml import dicttoxml
 
@@ -36,7 +32,7 @@ class Emerchantpay:
 
         self.api_url = api_url or DEFAULT_BASE_API_URL
 
-    def _prepare_headers(self, with_access_token=True):
+    def _prepare_headers(self):
         return {
             'Content-Type': 'text/xml',
         }
@@ -45,10 +41,12 @@ class Emerchantpay:
     def _generate_url(self, endpoint):
         return self.api_url + endpoint
 
-    def _send_request( self, endpoint: str, data: dict, tx_types:str, headers: dict):
-        print(data)
-        post_params = dicttoxml(data, attr_type=False, custom_root="wpf_payment")
-        post_params = post_params.decode('utf-8').replace("PLACEHOLDER", tx_types).encode('utf-8')
+    def _send_request( self, endpoint: str, data: dict, headers: dict):
+        req = {
+            "wpf_payment": data
+        }
+        print(req)
+        post_params = xmltodict.unparse(req, expand_iter="coord")
         print(post_params)
         auth = HTTPBasicAuth(self.username,self.password)
         r = requests.post(self._generate_url(endpoint), headers=headers, data=post_params, auth=auth)
@@ -57,18 +55,23 @@ class Emerchantpay:
             raise PaymentException(
                 'Emerchantpay error: {}. Error code: {}'.format(r.text, r.status_code))
 
-        return json.loads(r.text)
+        # return json.loads(r.text)
+        return xmltodict.parse(r.text)
     
-    def build_tx_types(self, transaction_types: List[str]) -> str:
+    def build_tx_types(self, transaction_types: List[str]) -> list:
         tx_types = []
         for tx in transaction_types:
-            tx_types.append(f'<transaction_type name="{tx}"/>')
+            tx_types.append({
+                "transaction_type": {
+                    "@name": tx
+                }
+            })
 
-        return ''.join(tx_types)
+        return tx_types
 
-    def checkout(self, data: PaymentRequest, transactions_types: List[str]) -> dict:
+    def checkout(self, data: PaymentRequest) -> dict:
         endpoint = '/wpf'
 
         headers = self._prepare_headers()
-        tx_types = self.build_tx_types(transactions_types)
-        return self._send_request(endpoint, asdict(data), tx_types, headers)
+        data.transaction_types = self.build_tx_types(data.transaction_types)
+        return self._send_request(endpoint, asdict(data), headers)

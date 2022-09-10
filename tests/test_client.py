@@ -21,9 +21,17 @@ def test_client():
         amount= str(randint(1, 10000)),
         currency= "USD",
         customer_email= "test@gmail.com",
-        billing_address=BillingAddress(country="USA", city="Sundasky")
+        billing_address=BillingAddress(country="USA", city="Sundasky"),
+        transaction_types=["authorize3d"]
     )
 
-    res = client.checkout(req, transactions_types=["authorize3d"])
+    res = client.checkout(req)
 
-    assert res is None
+    assert res is not None
+    assert "wpf_payment" in res
+    assert res["wpf_payment"]["status"] == "new"
+    assert res["wpf_payment"]["amount"] == req.amount
+    assert res["wpf_payment"]["currency"] == req.currency
+    assert "redirect_url" in res["wpf_payment"]
+
+
