@@ -3,12 +3,13 @@ from random import randint
 import pytest
 
 from emerchantpay.client import Emerchantpay
-from emerchantpay.types import PaymentRequest, BillingAddress
+from emerchantpay.types import PaymentRequest, BillingAddress, RefundRequest
 
-def test_client():
+def test_wpf():
     u = os.environ.get("MERCHANT_USERNAME")
     p = os.environ.get("MERCHANT_PASSWORD")
-    client = Emerchantpay(username=u, password=p)
+    t = os.environ.get("MERCHANT_TERMINAL")
+    client = Emerchantpay(username=u, password=p, terminal_code=t)
 
     req = PaymentRequest(
         transaction_id=str(randint(1, 10000)),
@@ -35,3 +36,20 @@ def test_client():
     assert "redirect_url" in res["wpf_payment"]
 
 
+def test_refund():
+    u = os.environ.get("MERCHANT_USERNAME")
+    p = os.environ.get("MERCHANT_PASSWORD")
+    t = os.environ.get("MERCHANT_TERMINAL")
+    client = Emerchantpay(username=u, password=p, terminal_code=t)
+
+    req = RefundRequest(
+        transaction_id=str(randint(1, 10000)),
+        reference_id="",
+        amount=randint(1, 10000),
+        currency= "USD",
+    )
+
+    res = client.refund(req)
+
+    assert res is not None
+    assert res == 1

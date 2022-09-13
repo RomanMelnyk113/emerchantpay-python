@@ -1,3 +1,4 @@
+import logging
 import json
 import xmltodict
 from datetime import date, datetime
@@ -10,10 +11,15 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 from . import PaymentException
-from emerchantpay.types import PaymentRequest
+from emerchantpay.types import PaymentRequest, RefundRequest
 
-DEFAULT_BASE_API_URL = 'https://staging.wpf.emerchantpay.net'
+BASE_WPF_URL = 'https://wpf.emerchantpay.net'
+TRANSACTION_API_URL = 'https://gate.emerchantpay.net/process'
 
+STAGING_BASE_WPF_URL = 'https://staging.wpf.emerchantpay.net'
+STAGING_TRANSACTION_API_URL = 'https://staging.gate.emerchantpay.net/process'
+
+logger = logging.getLogger(__name__)
 
 # https://emerchantpay.github.io/gateway-api-docs/?shell#create
 class Emerchantpay:
@@ -23,14 +29,19 @@ class Emerchantpay:
     # username
     username: str
 
+    # terminal_code
+    terminal_code: str
+
     # api endpoint
     api_url: str
 
-    def __init__(self, password, username, api_url=None):
+    def __init__(self, password, username, terminal_code, sandbox=True):
         self.password = password
         self.username = username
+        self.terminal_code = terminal_code
 
-        self.api_url = api_url or DEFAULT_BASE_API_URL
+        self.wpf_url = STAGING_BASE_WPF_URL if sandbox else BASE_WPF_URL
+        self.api_url = STAGING_TRANSACTION_API_URL if sandbox else TRANSACTION_API_URL
 
     def _prepare_headers(self):
         return {
@@ -38,19 +49,15 @@ class Emerchantpay:
         }
 
 
-    def _generate_url(self, endpoint):
+    def _generate_url(self, endpoint, wpf=True):
         return self.api_url + endpoint
 
-    def _send_request( self, endpoint: str, data: dict, headers: dict):
-        req = {
-            "wpf_payment": data
-        }
-        print(req)
-        post_params = xmltodict.unparse(req, expand_iter="coord")
-        print(post_params)
+    def _send_request( self, endpoint: str, data: dict, headers: dict) -> dict:
+        post_params = xmltodict.unparse(data, expand_iter="coord")
+        logger.debug("Emerchantpay request:", post_params)
         auth = HTTPBasicAuth(self.username,self.password)
-        r = requests.post(self._generate_url(endpoint), headers=headers, data=post_params, auth=auth)
-        print(r.text)
+        r = requests.post(endpoint, headers=headers, data=post_params, auth=auth)
+        logger.debug("Emerchantpay response:", r.text)
         if r.status_code != HTTPStatus.OK:
             raise PaymentException(
                 'Emerchantpay error: {}. Error code: {}'.format(r.text, r.status_code))
@@ -70,8 +77,20 @@ class Emerchantpay:
         return tx_types
 
     def checkout(self, data: PaymentRequest) -> dict:
-        endpoint = '/wpf'
+        endpoint = f'{self.wpf_url}/wpf'
 
         headers = self._prepare_headers()
         data.transaction_types = self.build_tx_types(data.transaction_types)
-        return self._send_request(endpoint, asdict(data), headers)
+        req = {
+            "wpf_payment": asdict(data)
+        }
+        return self._send_request(endpoint, req, headers)
+
+    def refund(self, data: RefundRequest) -> dict:
+        endpoint = f'{self.api_url}/{self.terminal_code}/'
+
+        headers = self._prepare_headers()
+        req = {
+            "payment_transaction": asdict(data)
+        }
+        return self._send_request(endpoint, req, headers)

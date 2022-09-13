@@ -30,3 +30,11 @@ class PaymentRequest:
     consumer_id: str = ""
 
 
+@dataclass
+class RefundRequest:
+    transaction_id: str
+    reference_id: str
+    amount: int
+    currency:str
+
+    transaction_type:str = "refund"
