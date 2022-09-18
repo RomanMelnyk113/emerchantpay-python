@@ -5,7 +5,6 @@ from datetime import date, datetime
 from http import HTTPStatus
 from typing import List
 from dataclasses import asdict
-from dicttoxml import dicttoxml
 import copy
 
 import requests
