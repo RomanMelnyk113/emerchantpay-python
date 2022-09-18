@@ -6,6 +6,7 @@ from http import HTTPStatus
 from typing import List
 from dataclasses import asdict
 from dicttoxml import dicttoxml
+import copy
 
 import requests
 from requests.auth import HTTPBasicAuth
@@ -90,7 +91,12 @@ class Emerchantpay:
         endpoint = f'{self.api_url}/{self.terminal_code}/'
 
         headers = self._prepare_headers()
+        trx = asdict(data)
+        for k in list(trx.keys()):
+            if trx[k] is None:
+                del trx[k]
+            
         req = {
-            "payment_transaction": asdict(data)
+            "payment_transaction": trx
         }
         return self._send_request(endpoint, req, headers)

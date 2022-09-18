@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 
 @dataclass
 class BillingAddress:
@@ -35,6 +35,6 @@ class RefundRequest:
     transaction_id: str
     reference_id: str
     amount: int
-    currency:str
+    currency:Optional[str] = None
 
     transaction_type:str = "refund"

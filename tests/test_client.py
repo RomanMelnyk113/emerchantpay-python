@@ -43,13 +43,13 @@ def test_refund():
     client = Emerchantpay(username=u, password=p, terminal_code=t)
 
     req = RefundRequest(
-        transaction_id=str(randint(1, 10000)),
-        reference_id="",
-        amount=randint(1, 10000),
-        currency= "USD",
+        transaction_id=f"test-refund-{randint(1,1000)}",
+        reference_id="test",
+        amount=230,
     )
-
+    print(req)
     res = client.refund(req)
+    print(res)
 
     assert res is not None
     assert res == 1
