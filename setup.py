@@ -56,5 +56,5 @@ setup(
     keywords='emerchantpay payment python',
     packages=['emerchantpay'],
 
-    install_requires=['requests', 'xmltodict'],
+    install_requires=['requests', 'xmltodict>=0.13.0,<1'],
 )
