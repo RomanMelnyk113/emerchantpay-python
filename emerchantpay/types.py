@@ -35,6 +35,6 @@ class RefundRequest:
     transaction_id: str
     reference_id: str
     amount: int
-    currency:Optional[str] = None
+    currency:str
 
     transaction_type:str = "refund"

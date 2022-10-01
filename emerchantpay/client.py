@@ -30,15 +30,15 @@ class Emerchantpay:
     username: str
 
     # terminal_code
-    terminal_code: str
+    terminal_codes: dict
 
     # api endpoint
     api_url: str
 
-    def __init__(self, password, username, terminal_code, sandbox=True):
+    def __init__(self, password, username, terminal_codes, sandbox=True):
         self.password = password
         self.username = username
-        self.terminal_code = terminal_code
+        self.terminal_codes = terminal_codes
 
         self.wpf_url = STAGING_BASE_WPF_URL if sandbox else BASE_WPF_URL
         self.api_url = STAGING_TRANSACTION_API_URL if sandbox else TRANSACTION_API_URL
@@ -87,7 +87,6 @@ class Emerchantpay:
         return self._send_request(endpoint, req, headers)
 
     def refund(self, data: RefundRequest) -> dict:
-        endpoint = f'{self.api_url}/{self.terminal_code}/'
 
         headers = self._prepare_headers()
         trx = asdict(data)
@@ -98,4 +97,6 @@ class Emerchantpay:
         req = {
             "payment_transaction": trx
         }
+        terminal_code = self.terminal_codes[data.currency]
+        endpoint = f'{self.api_url}/{terminal_code}/'
         return self._send_request(endpoint, req, headers)
