@@ -100,3 +100,12 @@ class Emerchantpay:
         terminal_code = self.terminal_codes[data.currency]
         endpoint = f'{self.api_url}/{terminal_code}/'
         return self._send_request(endpoint, req, headers)
+
+    def reconcile(self, unique_id:str) -> dict:
+
+        headers = self._prepare_headers()
+        req = {
+            "wpf_reconcile": {"unique_id":unique_id}
+        }
+        endpoint = f'{self.wpf_url}/wpf/reconcile'
+        return self._send_request(endpoint, req, headers)
