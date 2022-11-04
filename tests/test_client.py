@@ -9,7 +9,8 @@ def test_wpf():
     u = os.environ.get("MERCHANT_USERNAME")
     p = os.environ.get("MERCHANT_PASSWORD")
     t = os.environ.get("MERCHANT_TERMINAL")
-    client = Emerchantpay(username=u, password=p, terminal_code=t)
+    print(u)
+    client = Emerchantpay(username=u, password=p, terminal_codes=[t])
 
     req = PaymentRequest(
         transaction_id=str(randint(1, 10000)),
@@ -23,12 +24,16 @@ def test_wpf():
         currency= "USD",
         customer_email= "test@gmail.com",
         billing_address=BillingAddress(country="USA", city="Sundasky"),
-        transaction_types=["authorize3d"]
+        # transaction_types=[{"e_wallet": {"payment_type":"Paytm"}}]
+        # transaction_types=[{"google_pay": {}}]
+        transaction_types=[{"google_pay": {"payment_subtype": "sale"}}]
     )
 
+    print(req)
     res = client.checkout(req)
-
+    print(res)
     assert res is not None
+    assert res == 1
     assert "wpf_payment" in res
     assert res["wpf_payment"]["status"] == "new"
     assert res["wpf_payment"]["amount"] == req.amount

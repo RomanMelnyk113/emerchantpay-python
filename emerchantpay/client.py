@@ -1,9 +1,8 @@
 import logging
-import json
 import xmltodict
 from datetime import date, datetime
 from http import HTTPStatus
-from typing import List
+from typing import List, Dict
 from dataclasses import asdict
 import copy
 
@@ -65,14 +64,21 @@ class Emerchantpay:
         # return json.loads(r.text)
         return xmltodict.parse(r.text)
     
-    def build_tx_types(self, transaction_types: List[str]) -> list:
+    def build_tx_types(self, transaction_types: List[Dict[str, dict]]) -> list:
         tx_types = []
         for tx in transaction_types:
-            tx_types.append({
-                "transaction_type": {
-                    "@name": tx
+            if len(tx.keys()) > 1:
+                raise Exception("only 1 key is supported")
+
+            for tx_type, values in tx.items():
+                data = {
+                    "transaction_type": {
+                        "@name": tx_type,
+                        **values
+                    }
                 }
-            })
+
+                tx_types.append(data)
 
         return tx_types
 
