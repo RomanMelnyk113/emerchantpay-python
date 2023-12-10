@@ -27,7 +27,7 @@ class PaymentRequest:
     currency: str
     customer_email: str
     billing_address: BillingAddress
-    transaction_types: List[Dict[str, dict | str]]
+    transaction_types: List[dict]
 
     consumer_id: str = ""
 
