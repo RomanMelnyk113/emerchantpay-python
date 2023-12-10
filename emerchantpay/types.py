@@ -1,16 +1,18 @@
 from dataclasses import dataclass
 from typing import Dict, List
 
+
 @dataclass
 class BillingAddress:
-    country:str
-    city:str
+    country: str
+    city: str
 
-    first_name:str = ""
-    last_name:str = ""
-    address1:str = ""
-    zip_code:str = ""
-    state:str = ""
+    first_name: str = ""
+    last_name: str = ""
+    address1: str = ""
+    zip_code: str = ""
+    state: str = ""
+
 
 @dataclass
 class PaymentRequest:
@@ -24,8 +26,8 @@ class PaymentRequest:
     amount: str
     currency: str
     customer_email: str
-    billing_address:BillingAddress
-    transaction_types: List[Dict[str, dict]]
+    billing_address: BillingAddress
+    transaction_types: List[Dict[str, dict | str]]
 
     consumer_id: str = ""
 
@@ -35,6 +37,6 @@ class RefundRequest:
     transaction_id: str
     reference_id: str
     amount: int
-    currency:str
+    currency: str
 
-    transaction_type:str = "refund"
+    transaction_type: str = "refund"
