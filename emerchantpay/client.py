@@ -53,10 +53,10 @@ class Emerchantpay:
 
     def _send_request( self, endpoint: str, data: dict, headers: dict) -> dict:
         post_params = xmltodict.unparse(data, expand_iter="coord")
-        logger.debug("Emerchantpay request:", post_params)
+        logger.debug("Emerchantpay request: %s", post_params)
         auth = HTTPBasicAuth(self.username,self.password)
         r = requests.post(endpoint, headers=headers, data=post_params, auth=auth)
-        logger.debug("Emerchantpay response:", r.text)
+        logger.debug("Emerchantpay response: %s", r.text)
         if r.status_code != HTTPStatus.OK:
             raise PaymentException(
                 'Emerchantpay error: {}. Error code: {}'.format(r.text, r.status_code))
