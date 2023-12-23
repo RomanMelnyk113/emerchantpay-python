@@ -1,7 +1,5 @@
-import copy
 import logging
 from dataclasses import asdict
-from datetime import date, datetime
 from http import HTTPStatus
 from typing import Dict, List
 
@@ -9,7 +7,7 @@ import requests
 import xmltodict
 from requests.auth import HTTPBasicAuth
 
-from emerchantpay.types import PaymentRequest, RefundRequest
+from emerchantpay.types import RefundRequest
 
 from . import PaymentException
 
@@ -54,10 +52,10 @@ class Emerchantpay:
 
     def _send_request(self, endpoint: str, data: dict, headers: dict) -> dict:
         post_params = xmltodict.unparse(data, expand_iter="coord")
-        logger.debug("Emerchantpay request: %s", post_params)
+        # print("Emerchantpay request: %s", post_params)
         auth = HTTPBasicAuth(self.username, self.password)
         r = requests.post(endpoint, headers=headers, data=post_params, auth=auth)
-        logger.debug("Emerchantpay response: %s", r.text)
+        # print("Emerchantpay response: %s", r.text)
         if r.status_code != HTTPStatus.OK:
             raise PaymentException(
                 "Emerchantpay error: {}. Error code: {}".format(r.text, r.status_code)
@@ -73,12 +71,12 @@ class Emerchantpay:
 
         return tx_types
 
-    def checkout(self, data: PaymentRequest) -> dict:
+    def checkout(self, data: dict) -> dict:
         endpoint = f"{self.wpf_url}/wpf"
 
         headers = self._prepare_headers()
-        data.transaction_types = self.build_tx_types(data.transaction_types)
-        req = {"wpf_payment": asdict(data)}
+        data["transaction_types"] = self.build_tx_types(data.get("transaction_types"))
+        req = {"wpf_payment": data}
         return self._send_request(endpoint, req, headers)
 
     def refund(self, data: RefundRequest) -> dict:

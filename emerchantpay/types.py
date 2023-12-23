@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 
 @dataclass
@@ -28,8 +28,6 @@ class PaymentRequest:
     customer_email: str
     billing_address: BillingAddress
     transaction_types: List[dict]
-
-    consumer_id: str = ""
 
 
 @dataclass
